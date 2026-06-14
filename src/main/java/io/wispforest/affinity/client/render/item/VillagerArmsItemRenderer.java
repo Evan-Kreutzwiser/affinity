@@ -43,7 +43,7 @@ public class VillagerArmsItemRenderer implements BuiltinItemRendererRegistry.Dyn
         renderArms(findTexture("profession", Registries.VILLAGER_PROFESSION.getId(profession)), matrices, vertexConsumers, light, overlay);
 
         if (profession == VillagerProfession.NITWIT) return;
-        renderArms(findTexture("profession_level", VillagerClothingFeatureRendererAccessor.affinity$LevelToIdMap().get(MathHelper.clamp(data.getLevel(), 1, VillagerClothingFeatureRendererAccessor.affinity$LevelToIdMap().size()))), matrices, vertexConsumers, light, overlay);
+        renderArms(findTexture("profession_level", VillagerClothingFeatureRendererAccessor.LEVEL_TO_ID.get(MathHelper.clamp(data.getLevel(), 1, VillagerClothingFeatureRendererAccessor.LEVEL_TO_ID.size()))), matrices, vertexConsumers, light, overlay);
     }
 
     private static void renderArms(Identifier id, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {

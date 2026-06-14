@@ -33,3 +33,5 @@ accessible field net/minecraft/block/CandleBlock CANDLES_TO_PARTICLE_OFFSETS Lit
 accessible class net/minecraft/server/world/ServerChunkLoadingManager$TicketManager
 
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+
+accessible field net/minecraft/client/render/entity/feature/VillagerClothingFeatureRenderer LEVEL_TO_ID Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
