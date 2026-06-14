@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -93,8 +92,8 @@ public abstract class EntityMixin implements AffinityEntityAddon {
         cir.setReturnValue(cir.getReturnValueF() * 2.5f);
     }
 
-    @ModifyVariable(method = "updateWaterState", at = @At("LOAD"))
-    protected boolean updateFadeState(boolean value) {
+    @Inject(method = "updateWaterState", at = @At("RETURN"), cancellable = true)
+    protected void updateFadeState(CallbackInfoReturnable<Boolean> cir) {
         boolean wasTouchingFade = this.affinity$touchingBleach;
         this.touchingWater |= this.affinity$touchingBleach = this.updateMovementInFluid(ARCANE_FADE, 0.014);
 
@@ -102,7 +101,7 @@ public abstract class EntityMixin implements AffinityEntityAddon {
             ArcaneFadeFluid.ENTITY_TOUCH_EVENT.invoker().onTouch((Entity) (Object) this);
         }
 
-        return value || this.touchingWater;
+        cir.setReturnValue(this.touchingWater || cir.getReturnValue());
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
