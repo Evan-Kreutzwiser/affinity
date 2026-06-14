@@ -1,5 +1,7 @@
 package io.wispforest.affinity.blockentity.impl;
 
+import io.wispforest.affinity.aethumflux.net.AethumNetworkMember;
+import io.wispforest.affinity.aethumflux.net.MultiblockAethumNetworkMember;
 import io.wispforest.affinity.block.impl.SunshineMonolithBlock;
 import io.wispforest.affinity.blockentity.template.AethumNetworkMemberBlockEntity;
 import io.wispforest.affinity.blockentity.template.TickedBlockEntity;
@@ -8,7 +10,10 @@ import io.wispforest.affinity.object.AffinityBlocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
-public class SunshineMonolithBlockEntity extends AethumNetworkMemberBlockEntity implements TickedBlockEntity {
+import java.util.Collection;
+import java.util.List;
+
+public class SunshineMonolithBlockEntity extends AethumNetworkMemberBlockEntity implements TickedBlockEntity, MultiblockAethumNetworkMember {
     public SunshineMonolithBlockEntity(BlockPos pos, BlockState state) {
         super(AffinityBlocks.Entities.SUNSHINE_MONOLITH, pos, state);
 
@@ -65,5 +70,20 @@ public class SunshineMonolithBlockEntity extends AethumNetworkMemberBlockEntity 
                 world.getChunk(x, z).getComponent(AffinityComponents.LOCAL_WEATHER).removeMonolith(this.pos);
             }
         }
+    }
+
+    @Override
+    public Collection<BlockPos> memberBlocks() {
+        return List.of(this.getPos(), this.getPos().up());
+    }
+
+    @Override
+    public boolean isParent() {
+        return true;
+    }
+
+    @Override
+    public AethumNetworkMember parent() {
+        return this;
     }
 }
