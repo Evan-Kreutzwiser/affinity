@@ -33,3 +33,5 @@ accessible field net/minecraft/block/CandleBlock CANDLES_TO_PARTICLE_OFFSETS Lit
 accessible class net/minecraft/server/world/ServerChunkLoadingManager$TicketManager
 
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+
+accessible method net/minecraft/block/TallPlantBlock onBreakInCreative (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V

@@ -5,15 +5,13 @@ import io.wispforest.affinity.blockentity.impl.SunshineMonolithBlockEntity;
 import io.wispforest.affinity.blockentity.template.TickedBlockEntity;
 import io.wispforest.affinity.object.AffinityBlocks;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
@@ -93,6 +91,17 @@ public class SunshineMonolithBlock extends AethumNetworkMemberBlock {
         var downState = world.getBlockState(pos.down());
         return downState.isOf(this) && downState.get(HALF) == DoubleBlockHalf.LOWER;
     }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        // This is how vanilla doors handle preventing unwanted drops
+        if (!world.isClient && (player.isCreative() || !player.canHarvest(state))) {
+            TallPlantBlock.onBreakInCreative(world, pos, state, player);
+        }
+
+        return super.onBreak(world, pos, state, player);
+    }
+
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
