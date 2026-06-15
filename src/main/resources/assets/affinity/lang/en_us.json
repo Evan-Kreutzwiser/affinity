@@ -798,6 +798,7 @@
 
   "text.affinity.tooltip.aethum_storage": "Flux: %d/%d",
   "text.affinity.tooltip.creative_flux_cache_flux_level": "All of it, really",
+  "text.affinity.tooltip.disabled_by_redstone": "Disabled by redstone",
 
   "death.attack.asteroid": "%s was expunged by an Asteroid",
   "death.attack.asteroid.player": "%s was expunged by %s's Asteroid",

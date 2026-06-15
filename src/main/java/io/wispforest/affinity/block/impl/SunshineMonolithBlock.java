@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class SunshineMonolithBlock extends AethumNetworkMemberBlock {
 
     public static final BooleanProperty ENABLED = Properties.ENABLED;
+    public static final BooleanProperty POWERED = Properties.POWERED;
     public static final EnumProperty<DoubleBlockHalf> HALF = Properties.DOUBLE_BLOCK_HALF;
 
     public static final VoxelShape LOWER_SHAPE = VoxelShapes.union(
@@ -41,8 +42,25 @@ public class SunshineMonolithBlock extends AethumNetworkMemberBlock {
     public static final VoxelShape UPPER_SHAPE = Block.createCuboidShape(2, 0, 2, 14, 16, 14);
 
     public SunshineMonolithBlock() {
-        super(FabricBlockSettings.copyOf(Blocks.SMOOTH_STONE), CONSUMER_TOOLTIP);
-        this.setDefaultState(this.getDefaultState().with(Properties.ENABLED, false).with(HALF, DoubleBlockHalf.LOWER));
+        super(Settings.copy(Blocks.SMOOTH_STONE), CONSUMER_TOOLTIP);
+        this.setDefaultState(this.getDefaultState().with(ENABLED, false).with(HALF, DoubleBlockHalf.LOWER).with(POWERED, false));
+    }
+
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        var otherHalfPos = pos.offset(state.get(HALF) == DoubleBlockHalf.LOWER ? Direction.UP : Direction.DOWN);
+        var powered = world.isReceivingRedstonePower(pos) | world.isReceivingRedstonePower(otherHalfPos);
+
+        if (state.get(POWERED) != powered) {
+            world.setBlockState(pos, state.with(POWERED, powered), 2);
+
+            var otherState = world.getBlockState(otherHalfPos);
+            if (otherState.isOf(this) && otherState.get(POWERED) != powered) {
+                world.setBlockState(otherHalfPos, otherState.with(POWERED, powered));
+            }
+        }
+
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     @Override
@@ -73,9 +91,10 @@ public class SunshineMonolithBlock extends AethumNetworkMemberBlock {
     public BlockState getPlacementState(ItemPlacementContext context) {
         var pos = context.getBlockPos();
         var world = context.getWorld();
+        var powered = world.isReceivingRedstonePower(pos);
 
         return pos.getY() < world.getTopY() - 1 && world.getBlockState(pos.up()).canReplace(context)
-                ? super.getPlacementState(context)
+                ? super.getPlacementState(context).with(POWERED, powered)
                 : null;
     }
 
@@ -110,7 +129,7 @@ public class SunshineMonolithBlock extends AethumNetworkMemberBlock {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(Properties.ENABLED).add(HALF);
+        builder.add(ENABLED).add(HALF).add(POWERED);
     }
 
     @Nullable

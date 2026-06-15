@@ -8,6 +8,8 @@ import io.wispforest.affinity.blockentity.template.TickedBlockEntity;
 import io.wispforest.affinity.component.AffinityComponents;
 import io.wispforest.affinity.object.AffinityBlocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
@@ -24,7 +26,7 @@ public class SunshineMonolithBlockEntity extends AethumNetworkMemberBlockEntity 
     @Override
     public void tickServer() {
         long flux = flux();
-        boolean shouldBeEnabled = flux >= 1;
+        boolean shouldBeEnabled = flux >= 1 && !this.getCachedState().get(SunshineMonolithBlock.POWERED);
 
         if (shouldBeEnabled != this.getCachedState().get(SunshineMonolithBlock.ENABLED)) {
             this.world.setBlockState(this.pos, this.getCachedState().with(SunshineMonolithBlock.ENABLED, shouldBeEnabled));
@@ -69,6 +71,15 @@ public class SunshineMonolithBlockEntity extends AethumNetworkMemberBlockEntity 
             for (int z = blockChunkZ - radius; z <= blockChunkZ + radius; z++) {
                 world.getChunk(x, z).getComponent(AffinityComponents.LOCAL_WEATHER).removeMonolith(this.pos);
             }
+        }
+    }
+
+    @Override
+    public void appendTooltipEntries(List<Entry> entries) {
+        super.appendTooltipEntries(entries);
+
+        if (getCachedState().get(Properties.POWERED)) {
+            entries.add(Entry.icon(Text.translatable("text.affinity.tooltip.disabled_by_redstone"), 24, 8));
         }
     }
 
