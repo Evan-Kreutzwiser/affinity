@@ -1,6 +1,8 @@
 package io.wispforest.affinity.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.wispforest.affinity.Affinity;
 import io.wispforest.affinity.component.AffinityComponents;
@@ -92,5 +94,18 @@ public abstract class ServerWorldMixin extends World {
         }
 
         return pos;
+    }
+
+    // tickIceAndSnow doesn't use the position-aware hasRain call hooked in WorldMixin
+    // Ice is still permitted to form, only precipitation is blocked
+    @WrapOperation(method = "tickIceAndSnow", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;isRaining()Z"))
+    private boolean makeSunshineMonolithPreventSnow(ServerWorld instance, Operation<Boolean> original, BlockPos pos) {
+        var chunk = getWorldChunk(pos);
+        if (chunk instanceof EmptyChunk) {
+            return original.call(instance);
+        }
+
+        var component = chunk.getComponent(AffinityComponents.LOCAL_WEATHER);
+        return component.getRainGradient() > 0.2;
     }
 }
