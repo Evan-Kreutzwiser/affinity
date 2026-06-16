@@ -9,7 +9,6 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,26 +22,16 @@ import java.util.List;
 public abstract class DrawContextMixin {
 
     @Shadow
-    public abstract void fill(RenderLayer layer, int x1, int x2, int y1, int y2, int color);
-
-    @Unique
-    private boolean itemBarRendered = false;
+    public abstract void fill(RenderLayer layer, int x1, int y1, int x2, int y2, int color);
 
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
-    private void resetItemBarState(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
-        this.itemBarRendered = false;
-    }
-
-    @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIII)V", ordinal = 0))
     private void injectSecondaryItemBar(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
-        this.itemBarRendered = true;
-        this.affinity$renderSecondaryBar(x + 2, y + 11, stack);
-    }
+        var barHeight = y + 13;
+        if (stack.isItemBarVisible()) {
+            barHeight = y + 11;
+        }
 
-    @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;player:Lnet/minecraft/client/network/ClientPlayerEntity;", opcode = Opcodes.GETFIELD))
-    private void injectLateSecondaryItemBar(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
-        if (this.itemBarRendered) return;
-        this.affinity$renderSecondaryBar(x + 2, y + 13, stack);
+        this.affinity$renderSecondaryBar(x + 2, barHeight, stack);
     }
 
     @Unique
